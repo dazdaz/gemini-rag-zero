@@ -76,6 +76,12 @@ This demo shows how to:
 
 **Note**: The script requires sample PDF files in a `samples/` directory. You'll need to add your own documents or update the file paths in the script.
 
+## Supported Models
+
+The following Gemini models support File Search:
+- **gemini-2.5-pro** - Most capable, best for complex reasoning
+- **gemini-2.5-flash** - Faster and more cost-effective (used in this demo)
+
 ## Limits & Pricing
 
 **File Size Limits:**
