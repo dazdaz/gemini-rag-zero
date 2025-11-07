@@ -21,6 +21,12 @@ This demo shows how to:
 - ✅ Search the index directly (without generation)
 - ✅ Delete and cleanup resources
 
+**Note on Persistence:**
+- File Search Stores and their indexed data persist indefinitely in Gemini's cloud
+- This demo **deletes the store at the end** for cleanup
+- To keep your data persistent, simply comment out the deletion step in the script
+- Raw PDF files uploaded via File API expire after 48 hours, but the indexed/embedded data in the store remains until you delete it
+
 ## Setup
 
 1. **Get your API key**: https://aistudio.google.com/app/apikey

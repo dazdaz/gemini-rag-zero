@@ -138,6 +138,8 @@ def main():
                     print(f"   • {chunk.file_search.document.display_name}")
 
     print("\n🧹 Cleaning up...")
+    # NOTE: Comment out the line below to keep your File Search Store persistent
+    # The store and indexed data will remain in Gemini's cloud until you manually delete it
     client.file_search_stores.delete(name=file_search_store.name, config={'force': True})
     print("   Store deleted. All done! 🎉")
 
