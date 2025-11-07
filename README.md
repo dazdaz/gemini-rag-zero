@@ -76,6 +76,45 @@ This demo shows how to:
 
 **Note**: The script requires sample PDF files in a `samples/` directory. You'll need to add your own documents or update the file paths in the script.
 
+## Querying Your Stores
+
+Once you have persistent stores, query them from the command line:
+
+```bash
+# Interactive mode - select store and ask multiple questions
+python3 query-store.py
+
+# List available stores to query
+python3 query-store.py list
+
+# Query a specific store directly
+python3 query-store.py fileSearchStores/abc123 "What are the main topics?"
+
+# Query returns answers with citations
+python3 query-store.py fileSearchStores/abc123 "Summarize the key findings"
+```
+
+**Features:**
+- 🎯 Query ANY persistent File Search Store
+- 💬 Interactive mode with multiple questions
+- 📄 Automatic citations with page numbers
+- ⚡ Uses gemini-2.5-flash by default (fast & cost-effective)
+- 🔄 Works with all your stored documents
+
+**Example:**
+```
+🔍 Querying store: fileSearchStores/abc123
+
+Q: What are the revenue projections for Q4?
+
+A: According to the Q3 earnings report, Q4 revenue is projected to be $2.5M,
+   representing 15% growth year-over-year...
+
+📌 Sources:
+   • q3-2025-earnings.pdf
+     Pages: 12-14
+```
+
 ## Managing Your Stores
 
 Use the included management utility to view and manage your File Search Stores:
