@@ -76,6 +76,40 @@ This demo shows how to:
 
 **Note**: The script requires sample PDF files in a `samples/` directory. You'll need to add your own documents or update the file paths in the script.
 
+## Managing Your Stores
+
+Use the included utility script to view and manage your File Search Stores:
+
+```bash
+python3 list-stores.py
+```
+
+This will show you:
+- All your File Search Stores
+- Documents in each store
+- File sizes and upload dates
+- Metadata associated with documents
+
+**Example output:**
+```
+📚 Your File Search Stores:
+
+1. Company Knowledge Base - Demo
+   ID: fileSearchStores/abc123
+   Created: 2024-11-07
+
+📄 Documents in store: fileSearchStores/abc123
+
+1. sample1.pdf
+   Size: 0.05 MB
+   Uploaded: 2024-11-07
+2. sample2.pdf
+   Size: 3.77 MB
+   Uploaded: 2024-11-07
+
+Total: 2 document(s), ~3.82 MB
+```
+
 ## Supported Models
 
 The following Gemini models support File Search:
