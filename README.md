@@ -78,34 +78,47 @@ This demo shows how to:
 
 ## Managing Your Stores
 
-Use the included utility script to view and manage your File Search Stores:
+Use the included management utility to view and manage your File Search Stores:
 
 ```bash
-python3 list-stores.py
+# Interactive mode - browse stores and documents
+python3 manage-store.py
+
+# List all stores
+python3 manage-store.py list
+
+# List documents in a specific store
+python3 manage-store.py list fileSearchStores/abc123
+
+# Delete an entire store (with confirmation)
+python3 manage-store.py delete fileSearchStores/abc123
+
+# Remove a specific document (with confirmation)
+python3 manage-store.py remove fileSearchStores/abc123/documents/xyz789
 ```
 
-This will show you:
-- All your File Search Stores
-- Documents in each store
-- File sizes and upload dates
-- Metadata associated with documents
+**Features:**
+- 📚 List all File Search Stores
+- 📄 View documents in each store
+- 📊 See file sizes, upload dates, and metadata
+- 🗑️ Delete entire stores or individual documents
+- ✅ Safety confirmations before deletions
+- 🔄 Both interactive and CLI modes
 
 **Example output:**
 ```
 📚 Your File Search Stores:
 
 1. Company Knowledge Base - Demo
-   ID: fileSearchStores/abc123
+   Name: fileSearchStores/abc123
    Created: 2024-11-07
 
-📄 Documents in store: fileSearchStores/abc123
+📄 Documents in store:
 
 1. sample1.pdf
+   ID: fileSearchStores/abc123/documents/xyz789
    Size: 0.05 MB
-   Uploaded: 2024-11-07
-2. sample2.pdf
-   Size: 3.77 MB
-   Uploaded: 2024-11-07
+   Created: 2024-11-07
 
 Total: 2 document(s), ~3.82 MB
 ```
