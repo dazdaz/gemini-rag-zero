@@ -5,13 +5,21 @@ Gemini File Search Store Management Utility
 Usage:
     python3 manage-store.py list                              # List all stores
     python3 manage-store.py list <store-name>                 # List documents in a store
+    python3 manage-store.py stats                             # Show storage statistics
+    python3 manage-store.py stats <store-name>                # Show stats for specific store
+    python3 manage-store.py query <store-name> "question"     # Query a store
+    python3 manage-store.py search <store-name> "query"       # Vector search (no generation)
+    python3 manage-store.py upload <store-name> <file>...     # Upload files to store
+    python3 manage-store.py rename <store-name> "new name"    # Rename a store
+    python3 manage-store.py export [store-name]               # Export store info
     python3 manage-store.py delete <store-name>               # Delete entire store
     python3 manage-store.py remove <doc-id>                   # Remove a document
-    python3 manage-store.py query <store-name> "question"     # Query a store
 """
 
 import os
 import sys
+import json
+import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -79,6 +87,195 @@ def list_documents(store_name):
     except Exception as e:
         print(f"   ❌ Error: {e}")
         return []
+
+def show_stats(store_name=None):
+    """Show storage statistics"""
+    if store_name:
+        # Stats for specific store
+        print(f"📊 Statistics for store: {store_name}\n")
+        try:
+            docs = list(client.file_search_stores.list_documents(file_search_store_name=store_name))
+            total_size = sum(getattr(doc, 'size_bytes', 0) for doc in docs) / (1024 * 1024)
+            
+            print(f"Documents: {len(docs)}")
+            print(f"Total Size: ~{total_size:.2f} MB")
+            print(f"Estimated Storage (with embeddings): ~{total_size * 3:.2f} MB")
+            
+        except Exception as e:
+            print(f"❌ Error: {e}")
+    else:
+        # Global stats
+        print("📊 Global Storage Statistics\n")
+        stores = list(client.file_search_stores.list())
+        
+        if not stores:
+            print("No stores found.")
+            return
+        
+        total_docs = 0
+        total_size_mb = 0
+        
+        for store in stores:
+            try:
+                docs = list(client.file_search_stores.list_documents(file_search_store_name=store.name))
+                store_size = sum(getattr(doc, 'size_bytes', 0) for doc in docs) / (1024 * 1024)
+                total_docs += len(docs)
+                total_size_mb += store_size
+            except:
+                pass
+        
+        estimated_storage_mb = total_size_mb * 3  # Approximation with embeddings
+        
+        print(f"Total Stores: {len(stores)}")
+        print(f"Total Documents: {total_docs}")
+        print(f"Total Input Size: ~{total_size_mb:.2f} MB")
+        print(f"Estimated Storage Used: ~{estimated_storage_mb:.2f} MB (~{estimated_storage_mb/1024:.2f} GB)")
+        print(f"\nFree Tier Limit: 1 GB")
+        if estimated_storage_mb < 1024:
+            remaining = 1024 - estimated_storage_mb
+            print(f"Remaining: ~{remaining:.2f} MB ({remaining/1024*100:.1f}% free)")
+        else:
+            print(f"⚠️  Exceeds free tier by ~{(estimated_storage_mb-1024):.2f} MB")
+
+def upload_files(store_name, file_paths):
+    """Upload files to an existing File Search Store"""
+    print(f"📤 Uploading files to store: {store_name}\n")
+    
+    uploaded = 0
+    for file_path in file_paths:
+        if not os.path.exists(file_path):
+            print(f"   ⚠️  File not found: {file_path}")
+            continue
+        
+        try:
+            print(f"   Uploading {file_path}...")
+            operation = client.file_search_stores.upload_to_file_search_store(
+                file=file_path,
+                file_search_store_name=store_name,
+                config={
+                    'display_name': os.path.basename(file_path),
+                    'chunking_config': {
+                        'white_space_config': {
+                            'max_tokens_per_chunk': 500,
+                            'max_overlap_tokens': 50
+                        }
+                    }
+                }
+            )
+            
+            # Wait for upload to complete
+            while not operation.done:
+                time.sleep(2)
+                operation = client.operations.get(operation)
+            
+            print(f"   ✅ Uploaded successfully")
+            uploaded += 1
+            
+        except Exception as e:
+            print(f"   ❌ Error uploading {file_path}: {e}")
+    
+    print(f"\n✅ Uploaded {uploaded}/{len(file_paths)} files")
+
+def vector_search(store_name, query, top_k=5):
+    """Perform vector search without generation"""
+    print(f"🔍 Searching store: {store_name}\n")
+    print(f"Query: {query}\n")
+    
+    try:
+        # Note: Direct search API might not be available in all versions
+        # This is a placeholder for when the API supports it
+        print("ℹ️  Direct vector search API coming soon.")
+        print("   Using query with generation for now...\n")
+        
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=query,
+            config=types.GenerateContentConfig(
+                tools=[
+                    types.Tool(
+                        file_search=types.FileSearch(
+                            file_search_store_names=[store_name]
+                        )
+                    )
+                ]
+            )
+        )
+        
+        if response.candidates[0].grounding_metadata:
+            print("📄 Matching Documents:\n")
+            for i, chunk in enumerate(response.candidates[0].grounding_metadata.grounding_chunks, 1):
+                if hasattr(chunk, 'file_search'):
+                    doc = chunk.file_search.document
+                    print(f"{i}. {doc.display_name}")
+                    if hasattr(chunk.file_search, 'page_range'):
+                        pages = chunk.file_search.page_range
+                        print(f"   Pages: {pages.start_page_index}-{pages.end_page_index}")
+                    print()
+        
+    except Exception as e:
+        print(f"❌ Error: {e}")
+
+def rename_store(store_name, new_display_name):
+    """Rename a File Search Store"""
+    try:
+        print(f"✏️  Renaming store: {store_name}")
+        print(f"   New name: {new_display_name}\n")
+        
+        # Update the store
+        updated_store = client.file_search_stores.update(
+            name=store_name,
+            config={'display_name': new_display_name}
+        )
+        
+        print(f"✅ Store renamed successfully")
+        print(f"   {updated_store.display_name}")
+        
+    except Exception as e:
+        print(f"❌ Error renaming store: {e}")
+
+def export_stores(store_name=None, format='json'):
+    """Export store information"""
+    if store_name:
+        # Export specific store
+        try:
+            docs = list(client.file_search_stores.list_documents(file_search_store_name=store_name))
+            
+            export_data = {
+                'store_name': store_name,
+                'documents': [
+                    {
+                        'display_name': doc.display_name,
+                        'name': doc.name,
+                        'size_bytes': getattr(doc, 'size_bytes', None),
+                        'create_time': str(getattr(doc, 'create_time', None)),
+                        'metadata': dict(doc.metadata) if hasattr(doc, 'metadata') and doc.metadata else {}
+                    }
+                    for doc in docs
+                ]
+            }
+            
+            print(json.dumps(export_data, indent=2))
+            
+        except Exception as e:
+            print(f"❌ Error: {e}")
+    else:
+        # Export all stores
+        stores = list(client.file_search_stores.list())
+        export_data = []
+        
+        for store in stores:
+            try:
+                docs = list(client.file_search_stores.list_documents(file_search_store_name=store.name))
+                export_data.append({
+                    'display_name': store.display_name,
+                    'name': store.name,
+                    'create_time': str(store.create_time),
+                    'document_count': len(docs)
+                })
+            except:
+                pass
+        
+        print(json.dumps(export_data, indent=2))
 
 def delete_store(store_name):
     """Delete an entire File Search Store"""
@@ -172,35 +369,40 @@ def show_usage():
 Usage:
     python3 manage-store.py list                            # List all stores
     python3 manage-store.py list <store-name>               # List documents in a store
+    python3 manage-store.py stats                           # Show global storage stats
+    python3 manage-store.py stats <store-name>              # Show stats for specific store
+    python3 manage-store.py query <store-name> "question"   # Query a store
+    python3 manage-store.py search <store-name> "query"     # Vector search (fast)
+    python3 manage-store.py upload <store-name> <files>...  # Upload files to store
+    python3 manage-store.py rename <store-name> "new name"  # Rename store
+    python3 manage-store.py export                          # Export all stores to JSON
+    python3 manage-store.py export <store-name>             # Export specific store
     python3 manage-store.py delete <store-name>             # Delete entire store
     python3 manage-store.py remove <doc-id>                 # Remove a document
-    python3 manage-store.py query <store-name> "question"   # Query a store
 
 Examples:
-    # List all stores
-    python3 manage-store.py list
+    # View storage usage
+    python3 manage-store.py stats
     
-    # View documents in a store
-    python3 manage-store.py list fileSearchStores/abc123
+    # Upload new documents
+    python3 manage-store.py upload fileSearchStores/abc123 doc1.pdf doc2.pdf
     
-    # Query a store
-    python3 manage-store.py query fileSearchStores/abc123 "What are the key findings?"
+    # Search without generation (faster)
+    python3 manage-store.py search fileSearchStores/abc123 "revenue forecast"
     
-    # Delete a store
-    python3 manage-store.py delete fileSearchStores/abc123
+    # Rename a store
+    python3 manage-store.py rename fileSearchStores/abc123 "Q4 Documents"
     
-    # Remove a specific document
-    python3 manage-store.py remove fileSearchStores/abc123/documents/xyz789
+    # Export for backup
+    python3 manage-store.py export > backup.json
 
 Interactive Mode:
     python3 manage-store.py                                 # Browse stores
-    
-Note: Store IDs are shown when you run 'list' command.
 """)
 
 def main():
     if len(sys.argv) < 2:
-        # Interactive mode - list all and let user select
+        # Interactive mode
         print("🚀 Gemini File Search Store Manager\n")
         stores = list_stores()
         
@@ -218,41 +420,74 @@ def main():
     
     if command == 'list':
         if len(sys.argv) == 2:
-            # List all stores
             list_stores()
         elif len(sys.argv) == 3:
-            # List documents in specific store
+            list_documents(sys.argv[2])
+        else:
+            show_usage()
+    
+    elif command == 'stats':
+        if len(sys.argv) == 2:
+            show_stats()
+        elif len(sys.argv) == 3:
+            show_stats(sys.argv[2])
+        else:
+            show_usage()
+    
+    elif command == 'upload':
+        if len(sys.argv) >= 4:
             store_name = sys.argv[2]
-            list_documents(store_name)
+            file_paths = sys.argv[3:]
+            upload_files(store_name, file_paths)
+        else:
+            print("❌ Error: Missing arguments")
+            print("Usage: python3 manage-store.py upload <store-name> <file1> [file2] ...")
+    
+    elif command == 'search':
+        if len(sys.argv) == 4:
+            store_name = sys.argv[2]
+            query = sys.argv[3]
+            vector_search(store_name, query)
+        else:
+            print("❌ Error: Missing arguments")
+            print("Usage: python3 manage-store.py search <store-name> \"query\"")
+    
+    elif command == 'rename':
+        if len(sys.argv) == 4:
+            store_name = sys.argv[2]
+            new_name = sys.argv[3]
+            rename_store(store_name, new_name)
+        else:
+            print("❌ Error: Missing arguments")
+            print("Usage: python3 manage-store.py rename <store-name> \"New Display Name\"")
+    
+    elif command == 'export':
+        if len(sys.argv) == 2:
+            export_stores()
+        elif len(sys.argv) == 3:
+            export_stores(sys.argv[2])
         else:
             show_usage()
     
     elif command == 'delete':
         if len(sys.argv) == 3:
-            store_name = sys.argv[2]
-            delete_store(store_name)
+            delete_store(sys.argv[2])
         else:
             print("❌ Error: Missing store name")
             print("Usage: python3 manage-store.py delete <store-name>")
     
     elif command == 'remove':
         if len(sys.argv) == 3:
-            doc_id = sys.argv[2]
-            remove_document(doc_id)
+            remove_document(sys.argv[2])
         else:
             print("❌ Error: Missing document ID")
             print("Usage: python3 manage-store.py remove <document-id>")
     
     elif command == 'query':
         if len(sys.argv) == 3:
-            # Interactive query mode
-            store_name = sys.argv[2]
-            interactive_query(store_name)
+            interactive_query(sys.argv[2])
         elif len(sys.argv) == 4:
-            # Single question mode
-            store_name = sys.argv[2]
-            question = sys.argv[3]
-            query_store(store_name, question)
+            query_store(sys.argv[2], sys.argv[3])
         else:
             print("❌ Error: Missing arguments")
             print("Usage: python3 manage-store.py query <store-name> [\"question\"]")

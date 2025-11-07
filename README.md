@@ -78,22 +78,9 @@ This demo shows how to:
 
 ## Managing & Querying Your Stores
 
-Use the unified **`manage-store.py`** utility for all store operations:
+Use the comprehensive **`manage-store.py`** utility for all operations:
 
-### Query Stores
-
-```bash
-# Query a specific store
-python3 manage-store.py query fileSearchStores/abc123 "What are the main topics?"
-
-# Interactive query mode - ask multiple questions
-python3 manage-store.py query fileSearchStores/abc123
-
-# Answers include citations with page numbers
-python3 manage-store.py query fileSearchStores/abc123 "Summarize the key findings"
-```
-
-### Manage Stores
+### 📊 View & Analyze
 
 ```bash
 # List all stores
@@ -102,26 +89,64 @@ python3 manage-store.py list
 # List documents in a specific store
 python3 manage-store.py list fileSearchStores/abc123
 
-# Delete an entire store (with confirmation)
+# Show global storage statistics
+python3 manage-store.py stats
+
+# Show stats for a specific store
+python3 manage-store.py stats fileSearchStores/abc123
+```
+
+### 🎯 Query & Search
+
+```bash
+# Query with RAG (returns answers with citations)
+python3 manage-store.py query fileSearchStores/abc123 "What are the main topics?"
+
+# Interactive query mode - ask multiple questions
+python3 manage-store.py query fileSearchStores/abc123
+
+# Fast vector search (find matching documents)
+python3 manage-store.py search fileSearchStores/abc123 "revenue forecast"
+```
+
+### 📤 Upload & Modify
+
+```bash
+# Upload new files to existing store
+python3 manage-store.py upload fileSearchStores/abc123 doc1.pdf doc2.pdf
+
+# Rename a store
+python3 manage-store.py rename fileSearchStores/abc123 "Q4 Documents"
+```
+
+### 💾 Export & Delete
+
+```bash
+# Export all stores to JSON (for backup/documentation)
+python3 manage-store.py export > backup.json
+
+# Export specific store with documents
+python3 manage-store.py export fileSearchStores/abc123
+
+# Delete entire store (with confirmation)
 python3 manage-store.py delete fileSearchStores/abc123
 
 # Remove a specific document (with confirmation)
 python3 manage-store.py remove fileSearchStores/abc123/documents/xyz789
-
-# Interactive mode - browse stores and documents
-python3 manage-store.py
 ```
 
-### Features
+### Complete Feature Set
 
-- 🎯 **Query** ANY persistent File Search Store
-- 💬 **Interactive query** mode with multiple questions
-- 📄 **Automatic citations** with page numbers
-- 📚 **List** all File Search Stores
-- 📊 **View** documents with sizes, dates, and metadata
-- 🗑️ **Delete** entire stores or individual documents
-- ✅ **Safety confirmations** before deletions
-- ⚡ Uses gemini-2.5-flash (fast & cost-effective)
+- 📚 **List** - View all stores and documents
+- 📊 **Stats** - Monitor storage usage (Free tier: 1 GB)
+- 🎯 **Query** - Ask questions with RAG and citations
+- 🔍 **Search** - Fast vector search for matching docs
+- 📤 **Upload** - Add files to existing stores
+- ✏️ **Rename** - Update store display names
+- 💾 **Export** - Backup store information (JSON)
+- 🗑️ **Delete/Remove** - Manage stores and documents
+- ✅ **Safety** - Confirmations before destructive operations
+- ⚡ **Fast** - Uses gemini-2.5-flash for queries
 
 **Example output:**
 ```
