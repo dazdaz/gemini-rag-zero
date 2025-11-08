@@ -32,12 +32,19 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Use default model (gemini-2.5-flash)
+  # Use default model and questions
   python3 gemini-rag-zero.py
   
   # Use Pro model for better reasoning
   python3 gemini-rag-zero.py --model gemini-2.5-pro
   python3 gemini-rag-zero.py -m gemini-2.5-pro
+  
+  # Ask a custom question
+  python3 gemini-rag-zero.py --query "What are the main conclusions?"
+  python3 gemini-rag-zero.py -q "Explain the key findings"
+  
+  # Combine model and query options
+  python3 gemini-rag-zero.py -m gemini-2.5-pro -q "Summarize in detail"
         """
     )
     parser.add_argument(
@@ -45,6 +52,11 @@ Examples:
         choices=['gemini-2.5-flash', 'gemini-2.5-pro'],
         default='gemini-2.5-flash',
         help='Gemini model to use for queries (default: gemini-2.5-flash)'
+    )
+    parser.add_argument(
+        '-q', '--query',
+        type=str,
+        help='Ask a specific question instead of default questions'
     )
     args = parser.parse_args()
     
@@ -140,11 +152,15 @@ Examples:
 
     print("\n🤖 Asking questions with RAG enabled...")
     
-    questions = [
-        "Summarize the main topics covered in the documents.",
-        "What are the key findings or recommendations?",
-        "List any important dates or deadlines mentioned."
-    ]
+    # Use custom query if provided, otherwise use default questions
+    if args.query:
+        questions = [args.query]
+    else:
+        questions = [
+            "Summarize the main topics covered in the documents.",
+            "What are the key findings or recommendations?",
+            "List any important dates or deadlines mentioned."
+        ]
 
     for q in questions:
         print(f"\nQ: {q}")
@@ -173,7 +189,7 @@ Examples:
     print("\n🧹 Cleaning up...")
     # NOTE: Comment out the line below to keep your File Search Store persistent
     # The store and indexed data will remain in Gemini's cloud until you manually delete it
-#    client.file_search_stores.delete(name=file_search_store.name, config={'force': True})
+    client.file_search_stores.delete(name=file_search_store.name, config={'force': True})
     print("   Store deleted. All done! 🎉")
 
 if __name__ == "__main__":
