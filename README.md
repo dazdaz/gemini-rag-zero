@@ -213,23 +213,27 @@ python3 manage-filestore.py delete fileSearchStores/abc123
 python3 manage-filestore.py remove fileSearchStores/abc123/documents/xyz789
 ```
 
-### Complete Feature Set (15 Commands)
+### All Commands (13 Total)
 
-- 🆕 **Create** - Create new File Search Stores from scratch
-- ℹ️ **Info** - Get detailed metadata (active/pending/failed docs, storage size)
-- 📚 **List** - View all stores and documents
-- 📊 **Stats** - Monitor storage usage (Free tier: 1 GB)
-- 🎯 **Query** - Ask questions with RAG and citations
-- 🔍 **Search** - Fast vector search for matching docs
-- 📤 **Upload** - Add files to existing stores
-- 📥 **Import** - Import files already uploaded to File API (reuse across stores)
-- 🔄 **Operation** - Check status of long-running operations (uploads, imports)
-- ✏️ **Rename** - Update store display names
-- 💾 **Export** - Backup store information (JSON)
-- 🗑️ **Delete/Remove** - Manage stores and documents
-- ✅ **Safety** - Confirmations before destructive operations
-- ⚡ **Fast** - Uses gemini-2.5-flash for queries
-- 🖥️ **Interactive** - Browse stores interactively
+1. **create** - Create new File Search Stores from scratch
+2. **info** - Get detailed metadata (active/pending/failed docs, storage size)
+3. **list** - View all stores and documents
+4. **stats** - Monitor storage usage (Free tier: 1 GB)
+5. **query** - Ask questions with RAG and citations (uses gemini-2.5-flash)
+6. **search** - Fast vector search for matching docs
+7. **upload** - Add files to existing stores
+8. **import** - Import files already uploaded to File API (reuse across stores)
+9. **operation** - Check status of long-running operations (uploads, imports)
+10. **rename** - Update store display names
+11. **export** - Backup store information (JSON)
+12. **delete** - Delete entire stores (with confirmation)
+13. **remove** - Remove specific documents (with confirmation)
+
+### Key Features
+
+- ✅ **Safety First** - Confirmations before destructive operations
+- ⚡ **Performance** - Uses gemini-2.5-flash for fast, cost-effective queries
+- 🖥️ **Interactive Mode** - Browse stores interactively (run without arguments)
 
 **Example outputs:**
 
