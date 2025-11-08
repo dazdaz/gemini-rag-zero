@@ -1,8 +1,22 @@
 # Gemini File Search (RAG) – Python Demo
 
-Google released a **fully managed RAG system** built directly into the Gemini API (Nov 6, 2024).
+**Google just dropped a fully managed RAG system directly into the Gemini API** (Nov 6, 2024) — and it’s a game-changer for web developers!
 
-No vector DB. No embedding costs. No chunking code. Just upload files → ask questions with perfect citations.
+**No vector DB. No embedding costs. No chunking code.**  
+Just upload your files → ask questions → get perfect citations.
+
+### Introducing: **Gemini File Search Tool**  
+A 100% managed Retrieval-Augmented Generation system built right into the Gemini API.
+
+As a **JavaScript/Web developer**, here’s everything you need to know to start using it today:
+
+- Create and discover file search stores  
+- Concurrent & advanced upload techniques (multiple files, large docs, streaming)  
+- Update, list, retrieve, or delete documents on the fly  
+- Real-time citations with source linking  
+- Zero infrastructure to maintain  
+
+Upload PDFs, docs, code files, CSVs — ask natural-language questions — get accurate answers grounded in your data, with clickable source references.
 
 ## What is this?
 
