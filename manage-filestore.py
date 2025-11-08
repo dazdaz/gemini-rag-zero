@@ -3,6 +3,7 @@
 Gemini File Search Store Management Utility
 
 Usage:
+    python3 manage-store.py create "store name"               # Create a new store
     python3 manage-store.py list                              # List all stores
     python3 manage-store.py list <store-name>                 # List documents in a store
     python3 manage-store.py info <store-name>                 # Show detailed store info
@@ -31,6 +32,25 @@ load_dotenv()
 
 # Initialize the client
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+def create_store(display_name):
+    """Create a new File Search Store"""
+    print(f"📦 Creating new File Search Store...\n")
+    
+    try:
+        store = client.file_search_stores.create(
+            config={'display_name': display_name}
+        )
+        
+        print(f"✅ Store created successfully!\n")
+        print(f"Display Name: {store.display_name}")
+        print(f"Store Name: {store.name}")
+        print(f"Created: {store.create_time}")
+        print(f"\nYou can now upload files to this store:")
+        print(f"  python3 manage-filestore.py upload {store.name} file1.pdf file2.pdf")
+        
+    except Exception as e:
+        print(f"❌ Error creating store: {e}")
 
 def list_stores():
     """List all File Search Stores"""
@@ -564,6 +584,7 @@ def show_usage():
 🔧 Gemini File Search Store Manager
 
 Usage:
+    python3 manage-store.py create "name"                   # Create a new store
     python3 manage-store.py list                            # List all stores
     python3 manage-store.py list <store-name>               # List documents in a store
     python3 manage-store.py info <store-name>               # Show detailed store info
@@ -581,11 +602,15 @@ Usage:
     python3 manage-store.py remove <doc-id>                 # Remove a document
 
 New Features:
+    create    - Create a new File Search Store from scratch
     info      - Get detailed metadata (active/pending/failed docs, storage size)
     import    - Import files already uploaded to File API (reuse across stores)
     operation - Check status of long-running operations (uploads, imports)
 
 Examples:
+    # Create a new store
+    python3 manage-store.py create "My Knowledge Base"
+    
     # View detailed store info with metadata
     python3 manage-store.py info fileSearchStores/abc123
     
@@ -632,7 +657,14 @@ def main():
     
     command = sys.argv[1].lower()
     
-    if command == 'info':
+    if command == 'create':
+        if len(sys.argv) == 3:
+            create_store(sys.argv[2])
+        else:
+            print("❌ Error: Missing display name")
+            print("Usage: python3 manage-store.py create \"My Store Name\"")
+    
+    elif command == 'info':
         if len(sys.argv) == 3:
             get_store_info(sys.argv[2])
         else:
