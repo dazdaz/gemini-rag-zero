@@ -176,22 +176,54 @@ python3 manage-filestore.py remove fileSearchStores/abc123/documents/xyz789
 - ✅ **Safety** - Confirmations before destructive operations
 - ⚡ **Fast** - Uses gemini-2.5-flash for queries
 
-**Example output:**
-```
+**Example outputs:**
+
+```bash
+# List all stores
+$ ./manage-filestore.py list
 📚 Your File Search Stores:
 
 1. Company Knowledge Base - Demo
-   Name: fileSearchStores/abc123
-   Created: 2024-11-07
+   Name: fileSearchStores/company-knowledge-base-demo-kj90trspe5wo
+   Created: 2025-11-08 00:22:25.719967+00:00
+   Documents: 3
+```
 
-📄 Documents in store:
+```bash
+# Check storage statistics
+$ ./manage-filestore.py stats fileSearchStores/company-knowledge-base-demo-kj90trspe5wo
+📊 Statistics for store: fileSearchStores/company-knowledge-base-demo-kj90trspe5wo
 
-1. sample1.pdf
-   ID: fileSearchStores/abc123/documents/xyz789
-   Size: 0.05 MB
-   Created: 2024-11-07
+Documents: 3
+Total Size: ~4.23 MB
+Estimated Storage (with embeddings): ~12.69 MB
+```
 
-Total: 2 document(s), ~3.82 MB
+```bash
+# Query your documents
+$ ./manage-filestore.py query fileSearchStores/company-knowledge-base-demo-kj90trspe5wo "what is this about?"
+🔍 Querying store: fileSearchStores/company-knowledge-base-demo-kj90trspe5wo
+
+Q: what is this about?
+
+A: I found information about three different topics in the documents:
+
+1. **The Gettysburg Address**: This is a famous speech delivered by Abraham Lincoln 
+   on November 19, 1863, during the American Civil War. It was given at the dedication 
+   of the National Cemetery in Gettysburg, Pennsylvania.
+
+2. **Alice's Adventures in Wonderland**: This is a classic novel by Lewis Carroll, 
+   featuring illustrations by John Tenniel. The story begins with Alice feeling bored 
+   and then following a White Rabbit down a rabbit-hole.
+
+3. **Hamlet**: This refers to William Shakespeare's tragedy, "Hamlet". The provided 
+   text includes scenes from Act I, introducing characters like Francisco, Bernardo, 
+   Horatio, and Marcellus.
+
+📌 Sources:
+   • The Gettysburg Address
+   • Alice's Adventures in Wonderland
+   • Hamlet
 ```
 
 ## Supported Models
