@@ -401,17 +401,24 @@ def get_store_info(store_name):
         print(f"Created: {store.create_time}")
         print(f"Updated: {store.update_time}")
         print(f"\n📊 Document Statistics:")
-        print(f"   Active Documents: {store.active_documents_count}")
-        print(f"   Pending Documents: {store.pending_documents_count}")
-        print(f"   Failed Documents: {store.failed_documents_count}")
         
-        size_mb = int(store.size_bytes) / (1024 * 1024) if store.size_bytes else 0
+        # Handle None values for counts
+        active_count = int(store.active_documents_count) if store.active_documents_count is not None else 0
+        pending_count = int(store.pending_documents_count) if store.pending_documents_count is not None else 0
+        failed_count = int(store.failed_documents_count) if store.failed_documents_count is not None else 0
+        
+        print(f"   Active Documents: {active_count}")
+        print(f"   Pending Documents: {pending_count}")
+        print(f"   Failed Documents: {failed_count}")
+        
+        # Handle None for size_bytes
+        size_mb = int(store.size_bytes) / (1024 * 1024) if store.size_bytes is not None and store.size_bytes else 0
         print(f"\n💾 Storage:")
         print(f"   Raw Size: {size_mb:.2f} MB")
         print(f"   Estimated with Embeddings: ~{size_mb * 3:.2f} MB")
         
-        if int(store.failed_documents_count) > 0:
-            print(f"\n⚠️  Warning: {store.failed_documents_count} document(s) failed processing")
+        if failed_count > 0:
+            print(f"\n⚠️  Warning: {failed_count} document(s) failed processing")
         
     except Exception as e:
         print(f"❌ Error getting store info: {e}")
