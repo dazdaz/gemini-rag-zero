@@ -47,7 +47,7 @@ def list_stores():
         
         # Show document count
         try:
-            docs = list(client.file_search_stores.documents(file_search_store_name=store.name).list())
+            docs = list(client.file_search_stores.documents.list(file_search_store_name=store.name))
             print(f"   Documents: {len(docs)}")
         except:
             pass
@@ -61,7 +61,7 @@ def list_documents(store_name):
     
     try:
         # Try the correct API method - documents() instead of list_documents()
-        documents = list(client.file_search_stores.documents(file_search_store_name=store_name).list())
+        documents = list(client.file_search_stores.documents.list(file_search_store_name=store_name))
         
         if not documents:
             print("   No documents found in this store.")
@@ -99,7 +99,7 @@ def show_stats(store_name=None):
         # Stats for specific store
         print(f"📊 Statistics for store: {store_name}\n")
         try:
-            docs = list(client.file_search_stores.documents(file_search_store_name=store_name).list())
+            docs = list(client.file_search_stores.documents.list(file_search_store_name=store_name))
             total_size = sum(getattr(doc, 'size_bytes', 0) for doc in docs) / (1024 * 1024)
             
             print(f"Documents: {len(docs)}")
@@ -122,7 +122,7 @@ def show_stats(store_name=None):
         
         for store in stores:
             try:
-                docs = list(client.file_search_stores.documents(file_search_store_name=store.name).list())
+                docs = list(client.file_search_stores.documents.list(file_search_store_name=store.name))
                 store_size = sum(getattr(doc, 'size_bytes', 0) for doc in docs) / (1024 * 1024)
                 total_docs += len(docs)
                 total_size_mb += store_size
@@ -243,7 +243,7 @@ def export_stores(store_name=None, format='json'):
     if store_name:
         # Export specific store
         try:
-            docs = list(client.file_search_stores.documents(file_search_store_name=store_name).list())
+            docs = list(client.file_search_stores.documents.list(file_search_store_name=store_name))
             
             export_data = {
                 'store_name': store_name,
@@ -270,7 +270,7 @@ def export_stores(store_name=None, format='json'):
         
         for store in stores:
             try:
-                docs = list(client.file_search_stores.documents(file_search_store_name=store.name).list())
+                docs = list(client.file_search_stores.documents.list(file_search_store_name=store.name))
                 export_data.append({
                     'display_name': store.display_name,
                     'name': store.name,
