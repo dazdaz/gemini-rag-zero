@@ -138,6 +138,16 @@ python3 gemini-rag-zero.py --help
 
 Use the comprehensive **`manage-filestore.py`** utility for all operations:
 
+### 🆕 Create & Setup
+
+```bash
+# Create a new File Search Store
+python3 manage-filestore.py create "My Knowledge Base"
+
+# Get detailed store information (metadata, document counts, storage)
+python3 manage-filestore.py info fileSearchStores/abc123
+```
+
 ### 📊 View & Analyze
 
 ```bash
@@ -173,8 +183,18 @@ python3 manage-filestore.py search fileSearchStores/abc123 "revenue forecast"
 # Upload new files to existing store
 python3 manage-filestore.py upload fileSearchStores/abc123 doc1.pdf doc2.pdf
 
+# Import files already uploaded to File API (reuse across stores)
+python3 manage-filestore.py import fileSearchStores/abc123 files/xyz789
+
 # Rename a store
 python3 manage-filestore.py rename fileSearchStores/abc123 "Q4 Documents"
+```
+
+### 🔄 Advanced Operations
+
+```bash
+# Check status of long-running operations (uploads, imports)
+python3 manage-filestore.py operation fileSearchStores/abc123/operations/op456
 ```
 
 ### 💾 Export & Delete
@@ -193,18 +213,23 @@ python3 manage-filestore.py delete fileSearchStores/abc123
 python3 manage-filestore.py remove fileSearchStores/abc123/documents/xyz789
 ```
 
-### Complete Feature Set
+### Complete Feature Set (15 Commands)
 
+- 🆕 **Create** - Create new File Search Stores from scratch
+- ℹ️ **Info** - Get detailed metadata (active/pending/failed docs, storage size)
 - 📚 **List** - View all stores and documents
 - 📊 **Stats** - Monitor storage usage (Free tier: 1 GB)
 - 🎯 **Query** - Ask questions with RAG and citations
 - 🔍 **Search** - Fast vector search for matching docs
 - 📤 **Upload** - Add files to existing stores
+- 📥 **Import** - Import files already uploaded to File API (reuse across stores)
+- 🔄 **Operation** - Check status of long-running operations (uploads, imports)
 - ✏️ **Rename** - Update store display names
 - 💾 **Export** - Backup store information (JSON)
 - 🗑️ **Delete/Remove** - Manage stores and documents
 - ✅ **Safety** - Confirmations before destructive operations
 - ⚡ **Fast** - Uses gemini-2.5-flash for queries
+- 🖥️ **Interactive** - Browse stores interactively
 
 **Example outputs:**
 
